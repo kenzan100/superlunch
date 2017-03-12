@@ -79,3 +79,10 @@ Promise.all([rowsReturned, connOpened, onTime]).then(
 // });
 
 rtm.start();
+
+// for Heroku web dyno r10 reason, we explictly open the port
+var express = require('express');
+var app = express();
+app.listen((process.env.PORT || 5000), function(){
+  console.log('express has started');
+});
