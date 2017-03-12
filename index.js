@@ -16,8 +16,8 @@ var rowsReturned = new Promise(function(resolve, reject){
   });
 });
 
-var lunchHour = 20;
-var lunchMinute = 45;
+var lunchHour = process.env.LUNCH_HOUR || 20;
+var lunchMinute = process.env.LUNCH_MINUTE || 45;
 var lunchTime = moment().hours(lunchHour).minutes(lunchMinute);
 var onTime = new Promise(function(resolve, reject) {
   setInterval(function() {
