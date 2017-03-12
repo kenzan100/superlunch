@@ -8,7 +8,8 @@ var moment = require('moment');
 
 var rowsReturned = new Promise(function(resolve, reject){
   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-    client.query('SELECT * FROM places', function(err, res) {
+    var query = 'SELECT * from places ORDER BY RANDOM()';
+    client.query(query, function(err, res) {
       done();
       console.log(res.rows[0]);
       resolve(res.rows);
