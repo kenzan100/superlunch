@@ -26,7 +26,7 @@ var onTime = new Promise(function(resolve, reject) {
     if(moment().isAfter(lunchTime)) {
       resolve(true);
     }
-  }, 1 * 10 * 1000);
+  }, 1 * 30 * 1000);
 });
 
 NUMBERS_MAP = {
