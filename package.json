@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@slack/client": "^3.8.1",
+    "moment": "^2.17.1",
     "pg": "^6.1.4"
   }
 }

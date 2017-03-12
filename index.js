@@ -2,13 +2,13 @@ var RtmClient = require('@slack/client').RtmClient;
 var CLIENT_EVENTS = require('@slack/client').CLIENT_EVENTS.RTM;
 var RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
-var bot_token = "xoxb-152786402262-inLlvBeJrWW2BHZ21U5zJBsL";
-
+var bot_token = process.env.BOT_TOKEN;
 var rtm = new RtmClient(bot_token);
 
 var pg = require('pg');
+var moment = require('moment');
 
-var channelId = 'C0A8EN9DK';
+var channelId = process.env.CHANNEL_ID;
 
 var rowsReturned = new Promise(function(resolve, reject){
   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
@@ -29,27 +29,40 @@ var connOpened = new Promise(function(resolve, reject){
 
 var lunchHour = 20;
 var lunchMinute = 45;
+var lunchTime = moment().hours(lunchHour).minutes(lunchMinute);
 var onTime = new Promise(function(resolve, reject) {
   setInterval(function() {
-    var now = new Date();
-    console.log(now.getHours(), now.getMinutes());
-    if(now.getHours() === lunchHour &&
-       now.getMinutes() === lunchMinute) {
-      console.log(now);
+    if(moment().isAfter(lunchTime)) {
+      console.log(moment());
       resolve(true);
     }
   }, 1 * 5 * 1000);
 });
 
+NUMBERS_MAP = {
+  1: 'one',
+  2: 'two',
+  3: 'three',
+  4: 'four',
+  5: 'five',
+  6: 'six',
+  7: 'seven',
+  8: 'eight',
+  9: 'nine',
+  10: 'ten'
+};
+
 Helper = {
-  genereateMessage: function(names) {
-    return ':one:Hello!\n :two:hoge \n :three: aaa';
+  genereateMessage: function(rows) {
+    namesWithEmoji = rows.map(function(row, i) {
+      return ':' + NUMBERS_MAP[i+1] + ': ' + row.name;
+    });
+    return namesWithEmoji.join('\n');
   }
 };
 
 Promise.all([rowsReturned, connOpened, onTime]).then(
   function(results) {
-    console.log(results);
     [names, _, _] = results;
     var msg = Helper.genereateMessage(names);
     var msgProm = rtm.sendMessage(msg, channelId);
