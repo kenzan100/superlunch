@@ -68,3 +68,6 @@ var app = express();
 app.listen((process.env.PORT || 5000), function(){
   console.log('express has started');
 });
+app.get('/ping', function(req,res){
+  res.send('pong');
+});
