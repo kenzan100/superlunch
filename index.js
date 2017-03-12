@@ -22,11 +22,11 @@ var lunchMinute = process.env.LUNCH_MINUTE || 45;
 var lunchTime = moment().hours(lunchHour).minutes(lunchMinute);
 var onTime = new Promise(function(resolve, reject) {
   setInterval(function() {
+    console.log(moment());
     if(moment().isAfter(lunchTime)) {
-      console.log(moment());
       resolve(true);
     }
-  }, 1 * 5 * 1000);
+  }, 1 * 10 * 1000);
 });
 
 NUMBERS_MAP = {
