@@ -22,7 +22,7 @@ var lunchMinute = process.env.LUNCH_MINUTE || 45;
 var lunchTime = moment().hours(lunchHour).minutes(lunchMinute);
 var onTime = new Promise(function(resolve, reject) {
   setInterval(function() {
-    console.log(moment());
+    console.log('lunch:', lunchTime, 'now:', moment());
     if(moment().isAfter(lunchTime)) {
       resolve(true);
     }
