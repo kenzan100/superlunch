@@ -1,10 +1,14 @@
-var IncomingWebhook = require('@slack/client').IncomingWebhook;
-var url = process.env.SLACK_WEBHOOK_URL;
+var RtmClient = require('@slack/client').RtmClient;
+var CLIENT_EVENTS = require('@slack/client').CLIENT_EVENTS.RTM;
+var RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 
-var webhook = new IncomingWebhook(url);
+var bot_token = process.env.BOT_TOKEN;
+var rtm = new RtmClient(bot_token);
 
 var pg = require('pg');
 var moment = require('moment');
+
+var channelId = process.env.CHANNEL_ID;
 
 var rowsReturned = new Promise(function(resolve, reject){
   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
@@ -13,6 +17,13 @@ var rowsReturned = new Promise(function(resolve, reject){
       console.log(res.rows[0]);
       resolve(res.rows);
     });
+  });
+});
+
+var connOpened = new Promise(function(resolve, reject){
+  rtm.on(CLIENT_EVENTS.RTM_CONNECTION_OPENED, function() {
+    console.log('opened');
+    resolve(true);
   });
 });
 
@@ -50,16 +61,24 @@ Helper = {
   }
 };
 
-Promise.all([rowsReturned, onTime]).then(
+Promise.all([rowsReturned, connOpened, onTime]).then(
   function(results) {
     [names, _, _] = results;
     var msg = Helper.genereateMessage(names);
-    webhook.send(msg, function(err, res){
-      console.log('err', err);
-      console.log('res', res);
+    var msgProm = rtm.sendMessage(msg, channelId);
+
+    msgProm.then(function(res){
+      console.log(res);
     });
   }
 );
+
+// Bot can respond to reactions, but wouldn't it be overkill?
+// rtm.on(RTM_EVENTS.REACTION_ADDED, function(a, b, c){
+//   console.log(a);
+// });
+
+rtm.start();
 
 // for Heroku web dyno r10 reason, we explictly open the port
 var express = require('express');
