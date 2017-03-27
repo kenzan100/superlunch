@@ -20,10 +20,15 @@ var rowsReturned = new Promise(function(resolve, reject){
 var lunchHour = process.env.LUNCH_HOUR || 20;
 var lunchMinute = process.env.LUNCH_MINUTE || 45;
 var lunchTime = moment().hours(lunchHour).minutes(lunchMinute);
+
 var onTime = new Promise(function(resolve, reject) {
   setInterval(function() {
     console.log('lunch:', lunchTime, 'now:', moment());
-    if(moment().isAfter(lunchTime)) {
+    var isLunch = moment().isAfter(lunchTime);
+    var dayOfWeek = moment().day();
+    var isWeekDay = !(dayOfWeek === 0 || dayOfWeek === 6);
+    console.log(isWeekDay, dayOfWeek);
+    if(isLunch && isWeekDay) {
       resolve(true);
     }
   }, 1 * 30 * 1000);
